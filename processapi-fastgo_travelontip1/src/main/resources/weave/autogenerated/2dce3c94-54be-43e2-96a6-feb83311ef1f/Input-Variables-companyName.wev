@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_2dce3c94_54be_43e2_96a6_feb83311ef1f_Input_Variables_companyName = String | Null
+

@@ -1,0 +1,26 @@
+[
+ {
+"locationCode": "BEN-SG",
+"locationDesc":"beavuna singapore"
+ }, 
+{ 
+ "locationCode": "KLG-MY",
+  "locationDesc": "Klang Malaysia" 
+ },
+ { 
+ "locationCode": "KL-MY",
+  "locationDesc": "Klang Malaysia" 
+ },
+ {
+"locationCode": "BN-SG",
+"locationDesc":"beavuna singapore"
+ },
+ {
+"locationCode": "HYD",
+"locationDesc":"Hyderabad"
+ },
+ {
+"locationCode": "BLR",
+"locationDesc":"Banglore"
+ }
+ ]

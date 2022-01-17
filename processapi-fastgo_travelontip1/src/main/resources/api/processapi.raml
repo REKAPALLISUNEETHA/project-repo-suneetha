@@ -1,0 +1,50 @@
+#%RAML 1.0
+title: processapi
+description: "process api for routes and schedules"
+/booking:
+  /{transporttype}:
+    /Routes:
+       get:
+          headers:
+            transactionId:
+              required: true
+              type: string
+          queryParameters:
+            companyName:
+               required:  false
+               type: string
+            departureLocation:
+                required: false
+                type: string
+            destinationLocation:
+                required: false
+                type: string
+          responses:
+             200:
+                body:
+                   application/json:
+                     example: !include /example/routesexample.raml
+    /Schedules:
+      get:
+        headers:
+          transactionId:
+            required: true
+            type: string  
+        queryParameters:
+          companyName:
+               required:  false
+               type: string
+          departureLocation:
+                required: false
+                type: string
+          destinationLocation:
+                required: false
+                type: string
+          requestTimeZone:
+                required: false  
+                type: string
+        responses:
+          200:
+            body:
+              application/json:
+                example: !include /example/schedulesexample.raml

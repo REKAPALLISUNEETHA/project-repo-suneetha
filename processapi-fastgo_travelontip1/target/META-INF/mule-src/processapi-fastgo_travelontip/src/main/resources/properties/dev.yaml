@@ -1,0 +1,16 @@
+http:
+  host: "localhost"
+  port: '8085'
+  
+  requesterfastgo:
+    host: "localhost"
+    port: "8084"
+    routepath: "/fastgo/routes"
+    schedulepath: "/fastgo/Schedules"
+    
+  requestertravelontip:
+    host: "localhost"
+    port: "8083"
+    routepath: "/travelontip/routes"
+    schedulepath: "/travelontip/Schedules"
+    

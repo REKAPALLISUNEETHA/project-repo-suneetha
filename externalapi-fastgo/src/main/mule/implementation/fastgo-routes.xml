@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="05309b7d-a7cb-4ccd-9bc4-493d15c2f9d1" >
+		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.username}" password="${mysql.password}" database="${mysql.dbname}" />
+	</db:config>
+	<sub-flow name="fastgo-routesSub_Flow" doc:id="92daf3da-1cc1-4b62-9912-2f58f01fd9f9" >
+		<db:select doc:name="Select" doc:id="5a3c1b22-fb12-42ad-b32b-b4d03f399dd1" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM fastgo.routes;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2a9c0b9c-1a7d-4230-a73d-068b6ea062a7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

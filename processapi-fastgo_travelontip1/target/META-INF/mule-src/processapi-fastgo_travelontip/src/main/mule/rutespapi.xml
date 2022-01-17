@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bc9d94bf-8ce0-4976-8919-38e8ef4f9cd4" >
+		<http:request-connection host="${http.requesterfastgo.host}" port="${http.requesterfastgo.port}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="9968b126-dcd2-4814-9d92-112bc82330c8" >
+		<http:request-connection host="${http.requestertravelontip.host}" port="${http.requestertravelontip.port}" />
+	</http:request-config>
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="67f97fa0-95a8-43a9-92dc-ec4cf1f5b59d" objectStore="Object_store" keyGenerationExpression='#[vars.companyname ++ vars.transporttype ++ "Routes"]'/>
+	<sub-flow name="getroutes-travelontip" doc:id="382ffe51-9ccb-47fe-916a-7781cc69136a" >
+		<set-variable value='#["/api/"++(vars.transporttype default "Bus") ++ p("http.requestertravelontip.routepath")]' doc:name="Set Variable" doc:id="35ab6c89-e3c2-4c1e-9a02-d02072292b9f" variableName="resourcepath" />
+		<ee:cache doc:name="Cache" doc:id="3278d97d-d48c-41b2-b5de-93ccfa4c9849" cachingStrategy-ref="Caching_Strategy">
+					<http:request method="GET" doc:name="Request" doc:id="78c23328-dc92-428f-81ce-5a8b18497399" config-ref="HTTP_Request_configuration1" path="#[vars.resourcepath]">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"transactionid" : vars.transactionid
+}]]]></http:headers>
+					</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="6cf02f1c-e437-4869-99b7-ca79ef97dbee">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+---
+payload map(value,index)->{
+"comapanyCode": vars.companyname,
+"originLocation": {
+"locationCode": value.originLocation.locationCode,
+"locationDesc":"beavuna singapore"
+},
+"DestinationLocation":
+{ "locationCode": value.destinationLocation.locationCode,
+"locationDesc": "Klang Malaysia"
+}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="60fc745b-5448-4f23-86a7-ecec493522bb" message="logger inside cahe block" />
+				
+</ee:cache>
+	</sub-flow>
+	<sub-flow name="gerroutes" doc:id="2dce3c94-54be-43e2-96a6-feb83311ef1f" >
+		<set-variable value='#["/api/" ++ (vars.transporttype default "") ++ p("http.requesterfastgo.routepath")]' doc:name="Set Variable" doc:id="89a23652-fe86-47c7-a96d-857da56a4282" variableName="resourcepath" />
+		<ee:cache doc:name="Cache" doc:id="60832735-bc81-462f-b9d2-b889b86d16de" cachingStrategy-ref="Caching_Strategy">
+					<http:request method="GET" doc:name="Request" doc:id="dcc85239-3aa5-4232-98bc-859bb0b3d179" config-ref="HTTP_Request_configuration" path="#[vars.resourcepath]">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"transactionid" : vars.transactionid
+}]]]></http:headers>
+					</http:request>
+					<ee:transform doc:name="Transform Message" doc:id="a8a5fcc7-9484-46a7-85f4-f188405226f2">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+
+---
+payload map(value,index) ->{
+	
+ "comapanyCode": vars.companyname,
+"originLocation": {
+"locationCode": value.departureLocationCode,
+"locationDesc":"beavuna singapore"
+ },
+ "DestinationLocation":
+ { "locationCode": value.arrivalLocation, 
+   "locationDesc": "Klang Malaysia" 
+ }
+}
+
+]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="773c51b6-c025-4fb4-96bc-5b4ac2571ab9" message="logger inside cache" />
+				</ee:cache>
+	</sub-flow>
+	<sub-flow name="rutespapiSub_Flow" doc:id="86375d57-35e1-476c-8096-d84cfda4902f" >
+		<choice doc:name="Choice" doc:id="19864fae-8894-407b-b322-ebe0f3470af5" >
+			<when expression="#[vars.companyname == 'fastgo']">
+				<flow-ref doc:name="Flow Reference" doc:id="f9d12801-dedf-459d-b874-98b25a0be2a7" name="gerroutes" />
+			</when>
+			<when expression="#[vars.companyname == 'travelontip']">
+				<flow-ref doc:name="Flow Reference" doc:id="79d5557f-f467-49ef-8cd8-b3eae706a683" name="getroutes-travelontip" />		
+			</when>
+			<otherwise >
+				<scatter-gather doc:name="Scatter-Gather" doc:id="a8b61ba2-4ccb-44b9-8d2a-e3c67020817c" >
+					<route >
+						<set-variable value="fastgo" doc:name="Set Variable" doc:id="5bcd0ba8-accf-42cd-9254-6453e9f47779" variableName="companyname"/>
+						<flow-ref doc:name="Flow Reference" doc:id="03917889-7f89-4831-89f8-abc07475b372" name="gerroutes"/>
+					</route>
+					<route >
+						<set-variable value="travelontip" doc:name="Set Variable" doc:id="1f46b675-9191-48ce-b593-454e009fa492" variableName="companyname"/>
+						<flow-ref doc:name="Flow Reference" doc:id="fed88111-a9d0-4d0b-a4db-b36fc4c565d1" name="getroutes-travelontip"/>
+					</route>
+				</scatter-gather>
+				<logger level="INFO" doc:name="Logger" doc:id="1f1fe306-7faf-4d34-80a6-750abe230c36" message="payload"/>
+				<ee:transform doc:name="Transform Message" doc:id="f0bba954-7a3b-4f8d-9f1c-cd3f14362888" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(payload."0".payload default [])++(payload."1".payload default [])]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>
