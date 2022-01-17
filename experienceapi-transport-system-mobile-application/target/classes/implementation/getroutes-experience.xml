@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3aa095f7-2941-4f0e-a842-90bb96fd2a9c" >
+		<http:request-connection host="${http.requester.host}" port="${http.requester.port}" />
+	</http:request-config>
+	<sub-flow name="getRoutes-mobile-app-implementationSub_Flow" doc:id="2e91ed61-2ff7-4077-ab94-6e8c1c146252" >
+	<set-variable value='#["/api" ++ "/booking/" ++ (vars.transportType default "Bus") ++ p  ("http.requester.routepath")]' doc:name="Set Variable" doc:id="693ff7a7-755f-4779-9dc9-386aecf7164c" variableName="resourcepath"/>
+		<http:request method="GET" doc:name="Request" doc:id="88967a75-f0fa-4b9a-9c70-762afb4ecb17" config-ref="HTTP_Request_configuration" path="#[vars.resourcepath]">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	transactionId : vars.transactionId
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	departureLocation : vars.departureLocation
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="1750fe0a-098b-4ba0-8395-2165f1417bc9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(value,index)->
+{             
+    "companyCode": vars.companyName,
+    "originLocation": {
+    	"locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationDesc": "Klang Malaysia"
+    }
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

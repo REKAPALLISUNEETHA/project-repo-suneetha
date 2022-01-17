@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <http:listener-config name="exp-api-transport-system-proj-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8087" />
+    </http:listener-config>
+    <apikit:config name="exp-api-transport-system-proj-config" api="exp-api-transport-system-proj.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="f7ae97ca-f890-4cfe-beb2-a8df537082d6" file="properties\dev.yaml" />
+	<flow name="exp-api-transport-system-proj-main">
+        <http:listener config-ref="exp-api-transport-system-proj-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="exp-api-transport-system-proj-config" />
+    </flow>
+    <flow name="exp-api-transport-system-proj-console">
+        <http:listener config-ref="exp-api-transport-system-proj-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="exp-api-transport-system-proj-config" />
+    </flow>
+    <flow name="get:\booking\(transportType)\Routes:exp-api-transport-system-proj-config">
+         <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="transportType"><![CDATA[attributes.uriParams.'transportType']]></ee:set-variable>
+				<ee:set-variable variableName="transactionId" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.headers.transactionId]]></ee:set-variable>
+				<ee:set-variable variableName="companyName" ><![CDATA[attributes.queryParams.'companyName']]></ee:set-variable>
+				<ee:set-variable variableName="departureLocation" ><![CDATA[attributes.queryParams.departureLocation]]></ee:set-variable>
+				<ee:set-variable variableName="destinationLocation" ><![CDATA[attributes.queryParams.destinationLocation]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger for request for routes" doc:id="534305e7-e6dc-4246-ba7c-f56d18c22a84" message="Request Recieved for exp-api mobile app routes for transactionId---#[vars.transactionId]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="6ad64d0f-ed89-433a-b1db-3935f6d36041" name="getRoutes-mobile-app-implementationSub_Flow"/>
+		<logger level="INFO" doc:name="response Logger for routes" doc:id="a0d8a19d-18b7-4677-95f6-1c6b4beea791" message="Response sent for exp-api mobile app routes for transactionId---#[vars.transactionId]"/>
+    </flow>
+    <flow name="get:\booking\(transportType)\schedules:exp-api-transport-system-proj-config">
+         <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="transportType"><![CDATA[attributes.uriParams.'transportType']]></ee:set-variable>
+				<ee:set-variable variableName="transactionId" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.headers.transactionId]]></ee:set-variable>
+				<ee:set-variable variableName="companyName" ><![CDATA[attributes.queryParams.'companyName']]></ee:set-variable>
+				<ee:set-variable variableName="departureLocation" ><![CDATA[attributes.queryParams.departureLocation]]></ee:set-variable>
+				<ee:set-variable variableName="destinationLocation" ><![CDATA[attributes.queryParams.destinationLocation]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger for request for schedules" doc:id="6d4235aa-fded-467d-9e98-1a569933f756" message="Request Recieved for exp-api mobile app schedules for transactionId---#[vars.transactionId]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="1774c6b6-a4fb-4939-b0b4-90981ee57b04" name="getSchedules-mobile-app-implementationSub_Flow"/>
+		<logger level="INFO" doc:name="response Logger for schedules " doc:id="acb27af0-3172-4eb2-a101-2050decd106a" message="Response sent for exp-api mobile app schedules for transactionId---#[vars.transactionId]"/>
+    </flow>
+</mule>

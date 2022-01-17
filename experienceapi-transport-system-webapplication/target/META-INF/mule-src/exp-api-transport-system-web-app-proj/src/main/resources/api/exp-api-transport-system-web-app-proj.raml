@@ -1,0 +1,188 @@
+#%RAML 1.0
+title: exp-api-transport-system-web-app-proj
+/booking:
+ /{transportType}:
+   /Routes:
+     get:
+       headers:
+         transactionId:
+           required: true
+           type: string
+       queryParameters:
+         companyName:
+           type: string 
+           required: false
+         departureLocation:
+           type: string
+           required: false
+         destinationLocation:
+          required: false
+       responses:
+         200:
+           body:
+            application/json:
+              type: array
+              items:
+                type: object
+                properties:
+                  companyCode:
+                    type: string
+                    example: "Transactional"
+                    required: true
+                  originLocation:
+                    type: object
+                    properties:
+                      locationCode:
+                        type: string
+                        example: "BEN-SG"
+                        required: true
+                      locationDesc:
+                        type: string
+                        example: "beavuna singapore"
+                        required: true
+                  destinationLocation:
+                    type: object
+                    properties:
+                      locationCode:
+                        type: string
+                        example:  "KLG-MY"
+                        required: true
+                      locationDesc:
+                        type: string
+                        example:  "Klang Malaysia"
+                        required: true      
+              example: [
+                    {
+    "companyCode": "Transactional",
+    "originLocation": {
+      "locationCode": "BEN-SG",
+      "locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationCode": "KLG-MY",
+      "locationDesc": "Klang Malaysia"
+    }
+  },
+  {
+    "companyCode": "Transactional",
+    "originLocation": {
+      "locationCode": "BEN-SG",
+      "locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationCode": "KLG-MY",
+      "locationDesc": "Klang Malaysia"
+    }
+  }
+ ]
+         400:
+           body:
+             application/json:
+              type: object
+              properties:
+                status:
+                  type: number
+                  required: true
+                  example: 400
+                message:
+                  type: string
+                  required: true
+                  example: "error message"
+              example:
+                 {
+                   status: 400,
+                   message: "bad request"
+                 }       
+   /schedules:             
+     get:
+       headers:
+         transactionId:
+          required: true
+          type: string
+          example: "hdsfhjdh-jxbv859-sjdf7643-3746bbd"
+       queryParameters:
+         companyName:
+           type: string 
+           required: false
+           example: "fastgo"
+         departureLocation:
+           type: string
+           required: false
+           example: "klg"
+         destinationLocation:
+          type: string
+          required: false
+          example: "sg"
+         requestTimezone:
+           required: false
+           example: "0000"
+           type: string
+       responses:
+        200:
+          body:
+            application/json:
+              type: array
+              items:
+                type: object
+                properties:
+                  companyCode:
+                    type: string
+                    example: "fastgo"
+                    required: true
+                  originLocation:
+                    type: object
+                    properties:
+                      locationCode:
+                        type: string
+                        example: "BEN-SG"
+                        required: true
+                      locationDesc:
+                        type: string
+                        example: "beavuna singapore"
+                        required: true
+                  destinationLocation:
+                    type: object
+                    properties:
+                      locationCode:
+                        type: string
+                        example:  "KLG-MY"
+                        required: true
+                      locationDesc:
+                        type: string
+                        example:  "Klang Malaysia"
+                        required: true      
+              example: [
+                    {
+    "companyCode": "Transactional",
+    "originLocation": {
+      "locationCode": "BEN-SG",
+      "locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationCode": "KLG-MY",
+      "locationDesc": "Klang Malaysia"
+    }
+  },
+  {
+    "companyCode": "Transactional",
+    "originLocation": {
+      "locationCode": "BEN-SG",
+      "locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationCode": "KLG-MY",
+      "locationDesc": "Klang Malaysia"
+    }
+  }
+]
+                          
+
+
+
+                          
+
+
+
+
+
+               

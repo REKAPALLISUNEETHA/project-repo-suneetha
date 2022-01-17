@@ -1,0 +1,13 @@
+http:
+  host: "localhost"
+  port: '8088'
+  
+  requester:
+    host: "localhost"
+    port: "8085"
+    routepath: "/Routes"
+    schedulepath: "/Schedules"
+   
+    
+  
+    
