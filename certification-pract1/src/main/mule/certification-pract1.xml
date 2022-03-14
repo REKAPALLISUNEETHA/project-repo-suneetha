@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="37b234f0-aa85-462b-b45c-ff30682e5353" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="f5cdb76f-644f-44b5-9db0-8e27e207614c" >
+		<db:my-sql-connection host="mudb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+	<flow name="certification-pract1Flow" doc:id="0d5e7405-08f9-45a8-92d4-f68f33178c5d" >
+		<http:listener doc:name="Listener" doc:id="e4a8868c-5a9e-44e1-b0a8-d9c25105821c" config-ref="HTTP_Listener_config" path="/pract1"/>
+		<db:select doc:name="Select" doc:id="8444ee91-9218-4826-b399-cb3ae0b57e18" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from american;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2cc893e8-06fa-4597-b6aa-0ce49291ff1c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_certification-pract1Flow" doc:id="0b3b3b16-6a54-48ea-90eb-a7473aa91de6" >
+		<http:listener doc:name="Copy_of_Listener" doc:id="cc99b49e-fde8-4d0f-9402-f36727c463ec" config-ref="HTTP_Listener_config" path="/pract1/{ID}" />
+		<db:select doc:name="Copy_of_Select" doc:id="306d0ec2-d3a6-4b55-b156-142b74a99cd7" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * from american where ID = :ID;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"ID":attributes.uriParams.ID
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Copy_of_Transform Message" doc:id="49cf8fe5-1bb8-42c4-9410-2e4f97060c7c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

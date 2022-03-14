@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2edc61a3-56f2-4161-bab3-2f575d9db31c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="45f6cc35-d5a4-4517-9c17-585769a5551e" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="4adcf9b7-6d1b-413e-b84a-717d00680b7d" >
+		<http:request-connection host="localhost" port="8082" />
+	</http:request-config>
+	<flow name="tragetvarFlow" doc:id="a01a5ea8-e3fe-405c-9193-71e409b602ac" >
+		<http:listener doc:name="Listener" doc:id="bac73576-9267-46af-9cb5-f69a4bc36dda" config-ref="HTTP_Listener_config" path="/tv">
+			<repeatable-in-memory-stream />
+		</http:listener>
+		<set-payload value="suneetha" doc:name="Set Payload" doc:id="89b4ff43-f12d-4224-b630-0774984dc95a" />
+		<http:request method="GET" doc:name="Request" doc:id="800fcc76-0853-44eb-b1fd-da5abb460a46" config-ref="HTTP_Request_configuration" path="/pv" target="targetval"/>
+		<ee:transform doc:name="Transform Message" doc:id="518559b7-2e6b-4361-82f7-fba5b8ecdec4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	//"original payload":vars.targetval,
+	 "payload": payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="tragetvarFlow1" doc:id="24cf1319-8f33-4e46-8d34-4fcf06030ecb" >
+		<http:listener doc:name="Listener" doc:id="949c16cf-22a2-4ecc-a811-d90b1767a497" config-ref="HTTP_Listener_config1" path="/pv"/>
+		<set-payload value="raahithya" doc:name="Set Payload" doc:id="aa8b492d-41ef-4b89-b8f4-19448ebeb2e0" />
+	</flow>
+</mule>

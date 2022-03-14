@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b70b70de-d629-4bbc-ad20-7b46a50f0d3e" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="76b42bcb-3ac6-4d2f-a565-b7b800276bfc" >
+		<file:connection workingDir="D:\" />
+	</file:config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="66cf6045-b486-481f-bd82-31d7adb1dd5b" >
+		<file:connection workingDir="C:\Users\suneethar\Documents" />
+	</file:config>
+	<flow name="taskin-suneethaFlow" doc:id="3fbf6528-41f2-4dae-b8aa-955324ed3fb0" >
+		<http:listener doc:name="Listener" doc:id="9530bbe3-6978-4303-a130-cde4da82cee1" config-ref="HTTP_Listener_config" path="/ss"/>
+		<file:read doc:name="Read" doc:id="dd1ed597-56e1-43aa-b7fc-d7c9b750fab4" config-ref="File_Config" path="D:/task3.txt"/>
+		<file:write doc:name="Write" doc:id="d6b9e9b7-4334-490c-99fe-cf7b274ece62" config-ref="File_Config1" path="task2.txt"/>
+		<logger level="INFO" doc:name="Logger" doc:id="55c2758e-f191-4f73-a6d4-25d9e6b45eee" message="#[payload]"/>
+	</flow>
+</mule>

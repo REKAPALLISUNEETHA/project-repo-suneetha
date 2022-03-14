@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="941cb5c3-ef56-4c6e-bdfb-cdaa09a5b573" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="059f12d5-0832-4046-b672-06db41c8c4af" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="certification-pract2Flow" doc:id="71d03df9-a088-4bb0-89c8-8ff6ac59de39" >
+		<http:listener doc:name="Listener" doc:id="ab2edc86-31bb-4350-a63c-30cd25422cad" config-ref="HTTP_Listener_config" path="/pract2" allowedMethods="get"/>
+		<set-payload value='#["hello"]' doc:name="Set Payload" doc:id="30d7d2e0-e1de-43b7-bd72-d4f55efa8fc9" />
+		<http:request method="GET" doc:name="Request" doc:id="92fd9658-5055-420b-8f71-40fd1660a540" config-ref="HTTP_Request_configuration" path="/prac2" responseTimeout="300000">
+		</http:request>
+		<set-variable value='#["adabala"]' doc:name="Set Variable" doc:id="09d1a6dc-46a7-4fae-b6d8-5f501f768e5f" variableName="fname" />
+		<logger level="INFO" doc:name="Logger" doc:id="610a0b55-4306-4d32-b396-02a8de655987" message="#[payload]"/>
+	</flow>
+	<flow name="certification-pract2Flow1" doc:id="a90115b5-6560-448c-99ee-cdbe584a0ac6" >
+		<http:listener doc:name="Listener" doc:id="2a4b30dc-36b7-4504-b31d-feef07005002" config-ref="HTTP_Listener_config" path="/prac2" allowedMethods="get"/>
+		<set-payload value="#['Goodbye']" doc:name="Set Payload" doc:id="59d5a00c-6e17-4ff8-9936-c730d5a0ab38" />
+		<logger level="INFO" doc:name="Logger" doc:id="29ca3320-68b3-44bd-80ba-e8164fd46767" message="#[payload]"/>
+	</flow>
+</mule>

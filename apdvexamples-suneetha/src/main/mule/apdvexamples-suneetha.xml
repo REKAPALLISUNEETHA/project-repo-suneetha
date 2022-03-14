@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="49fd9a9e-9e2e-42ba-aa5f-16c1f2f9e5a5" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="54a71c29-af5f-4c60-8b14-2384e41561dc" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="028469ae-3e30-4a6d-a926-b8fdf9e258a2" >
+		<vm:queues >
+			<vm:queue queueName="VMgoodbye" />
+		</vm:queues>
+	</vm:config>
+	<flow name="privateflow" doc:id="505a8941-e5cf-4e8d-99f9-af91211e1b3c" >
+		<http:request method="GET" doc:name="Request" doc:id="4ae913cd-5e61-4cbc-9e71-059e8bc6ff0f" config-ref="HTTP_Request_configuration" path="/goodbye" responseTimeout="300000">
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"FullName" : "Max Mule"
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+	<flow name="apdvexamples-suneethaFlow" doc:id="fe357044-9bbf-4ae9-b0cb-6dd34ec33700" >
+		<http:listener doc:name="Get /hello" doc:id="a0d4ee74-49db-4b8d-be82-a0b0dc2de9e4" config-ref="HTTP_Listener_config" path="/hello" allowedMethods="get">
+			<http:response >
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Name" : vars.firstName
+}]]]></http:headers>
+			</http:response>
+			<http:error-response reasonPhrase="Success" />
+		</http:listener>
+		<flow-ref doc:name="subFlow Reference" doc:id="bf74da98-1653-4e30-8a8b-4e85f3d68468" name="apdvexamples-suneethaSub_Flow"/>
+		<vm:publish-consume doc:name="Publish consume" doc:id="24b2168b-b3dd-49bb-8004-cb2e10f8f228" config-ref="VM_Config" queueName="VMgoodbye" timeout="10"/>
+		<logger level="INFO" doc:name="payload" doc:id="4dd7993d-5692-4b9e-9d6a-fc3ef5966c53" message="#['\nMessage '++ payload]"/>
+	</flow>
+	<sub-flow name="apdvexamples-suneethaSub_Flow" doc:id="b8fa886f-93ad-439f-a03c-9dc880f28379" >
+		<set-variable value="#[message.attributes.queryParams.fname]" doc:name="Set Variable" doc:id="8cace7d6-0485-4d58-a175-f39ac7f2c076" variableName="firstName" />
+		<set-payload value="Hello" doc:name="Set Payload" doc:id="93133ad7-b000-4a49-a562-7e91be46395b" />
+	</sub-flow>
+	<flow name="apdvexamples-suneethaFlow1" doc:id="daca0067-885f-4814-9655-9817008a37f9" >
+		<vm:listener queueName="VMgoodbye" doc:name="Listener" doc:id="38e7c7f0-8ea1-4d18-8c19-83974412372c" config-ref="VM_Config"/>
+		<set-payload value="#[upper('Goodbye')]" doc:name="Set Payload" doc:id="8c36d04c-4f9a-4dfe-8358-5e75f234a89f" />
+		<logger level="INFO" doc:name="Logger" doc:id="cd35e98b-e980-464f-b7bd-8604ae03b722" message="#[attributes.queryParams]"/>
+	</flow>
+	<flow name="apdvexamples-suneethaFlow2" doc:id="7cf8e1f9-5ca7-48a0-8024-30590d59b583" >
+		<http:listener doc:name="GET /sfdc" doc:id="b6f09dbf-5789-48df-af3b-f14d581a1afe" config-ref="HTTP_Listener_config" path="/sfdc" allowedMethods="GET"/>
+		<ee:transform doc:name="Transform Message" doc:id="7f7fcf5b-0057-4211-aa50-26962225b4e9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
